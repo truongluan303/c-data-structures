@@ -1,20 +1,15 @@
 #include "vector.h"
 #include <stdio.h>
 
-int main(int argc, char** argv) 
+int main() 
 {
-    // ignore program name
-    argc--;
-    argv++;
-
     vector v;
-    construct_vector(&v, sizeof(int));
+    construct_vector(&v, INT);
 
-    append(&v, 10);
-    append(&v, 20);
-    append(&v, 30);
+    vector_pushback(&v, (void*)1);
+    vector_pushback(&v, (void*)2);
+    vector_pushback(&v, (void*)3);
+    vector_pushfront(&v, (void*)-1);
 
-    //printf("%d", popback(&v));
-
-    free(v.buf);
+    vector_free(&v);
 }

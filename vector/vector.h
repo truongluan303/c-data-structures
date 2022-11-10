@@ -6,6 +6,9 @@
 #define MIN_CAPACITY        32
 #define NOT_EXIST           -1
 
+#define SUCCESS             0
+#define FAILURE             1
+
 /******************************************************************************
  * @brief       Represents a boolean state
  *****************************************************************************/
@@ -16,12 +19,22 @@ typedef enum {
 BOOLEAN;
 
 /******************************************************************************
+ * @brief       Represents the data type of the elements in the vector
+******************************************************************************/
+typedef enum {
+    INT,
+    UINT64,
+    CHAR
+}
+DATATYPE;
+
+/******************************************************************************
  * @brief       Represents the vector. Containing an array, the array's
  *              capacity, the actual elements count in the array, and the size
  *              of each data element.
  *****************************************************************************/
 typedef struct _vector {
-    void*   buf;            /* the array */
+    void**  buf;            /* the array */
     size_t  capacity;       /* the capacity of the array */
     size_t  count;          /* number of elements currently in the array */
     size_t  data_size;      /* size of each data element */
@@ -33,8 +46,10 @@ vector;
  * 
  * @param v             The vector to be initialized.
  * @param data_size     The size of the data type.
+ * 
+ * @return      0 if successful, 1 otherwise.
  *****************************************************************************/
-void    construct_vector(vector* v, size_t data_size);
+int construct_vector(vector* v, DATATYPE datatype);
 
 /******************************************************************************
  * @brief       Get the element at a given index in the vector.
@@ -44,16 +59,18 @@ void    construct_vector(vector* v, size_t data_size);
  * 
  * @return      The data at the given index.
  *****************************************************************************/
-void*   get(vector* v, size_t index);
+void* vector_get(vector* v, size_t index);
 
 /******************************************************************************
  * @brief       Set the data at a given index in the vector.
  * 
  * @param v             The vector to set data.
- * @param data_size     The index where data will be set.
+ * @param index         The index where data will be set.
  * @param data          The data to be assigned.
+ * 
+ * @return      0 if successful, 1 otherwise.
  *****************************************************************************/
-void    set(vector* v, size_t index, const void* data);
+int vector_set(vector* v, size_t index, void* data);
 
 /******************************************************************************
  * @brief       Add a new element to the end of the vector.
@@ -61,7 +78,9 @@ void    set(vector* v, size_t index, const void* data);
  * @param v             The vector to be initialized.
  * @param data          The data to be added.
  *****************************************************************************/
-void    append(vector* v, const void* data);
+int vector_pushback(vector* v, void* data);
+
+int vector_pushfront(vector* v, void* data);
 
 /******************************************************************************
  * @brief       Remove the element at the end of the vector.
@@ -70,7 +89,17 @@ void    append(vector* v, const void* data);
  * 
  * @return      The data removed.
  *****************************************************************************/
-void*   popback(vector* v);
+void* vector_popback(vector* v);
+
+/******************************************************************************
+ * @brief       Remote the element at the given index.
+ * 
+ * @param v             The vector to remove the element from.
+ * @param index         The index of the element to be removed.
+ * 
+ * @return      The value of the deleted element.
+*/
+void* vector_delete(vector* v, size_t index);
 
 /******************************************************************************
  * @brief       Check if the vector contains a specific data value.
@@ -80,7 +109,7 @@ void*   popback(vector* v);
  * 
  * @return      TRUE if the vector contains the given data, FALSE otherwise.
  *****************************************************************************/
-BOOLEAN contains(vector* v, const void* data);
+BOOLEAN vector_contains(vector* v, void* data);
 
 /******************************************************************************
  * @brief       Find the location 
@@ -91,6 +120,13 @@ BOOLEAN contains(vector* v, const void* data);
  * @return      The index of the first occurence of the given data, -1 if the
  *              given data does not exist.
  *****************************************************************************/
-int     find(vector* v, const void* data);
+int vector_find(vector* v, void* data);
+
+/******************************************************************************
+ * @brief       Deallocates the memory allocated for the vector
+ * 
+ * @return      0 if successful, 1 otherwise
+******************************************************************************/
+int vector_free(vector* v);
 
 #endif

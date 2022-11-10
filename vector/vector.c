@@ -1,106 +1,186 @@
 #include "vector.h"
-#include <string.h>
 
-/*===========================================================================*/
-/* construct_vector                                                          */
-/*===========================================================================*/
-void construct_vector(v, data_size)
 
+//===========================================================================//
+//                          Helper Functions Prototypes                      //
+//===========================================================================//
+size_t  get_data_size(DATATYPE datatype);
+
+int     vector_resize(vector* v, size_t new_capacity);
+
+
+//===========================================================================//
+//                          Vector Functions Definitions                     //
+//===========================================================================//
+
+int construct_vector(v, datatype)
     vector*         v;
-    size_t          data_size;
-
+    DATATYPE        datatype;
 {
+    size_t datasize = get_data_size(datatype);
+    if (datasize == 0) return FAILURE;
+
     v->capacity     = MIN_CAPACITY;
     v->count        = 0;
-    v->data_size    = data_size;
-    v->buf          = malloc(data_size * v->capacity);
+    v->data_size    = datasize;
+    v->buf          = malloc(datasize * v->capacity);
+
+    return SUCCESS;
 }
 
-/*===========================================================================*/
-/* get                                                                       */
-/*===========================================================================*/
-void* get(v, index)
 
+void* vector_get(v, index)
     vector*         v;
     size_t          index;
-
 {
-    return v->buf + index;
+    if (v == NULL) return NULL;
+    if (index < v->count) return v->buf[index];
+    return NULL;
 }
 
-/*===========================================================================*/
-/* set                                                                       */
-/*===========================================================================*/
-void set(v, index, data)
 
+int vector_set(v, index, data)
     vector*         v;
     size_t          index;
-    const void*     data;
-
+    void*           data;
 {
-    size_t loc = index * v->data_size;
-    memcpy(v->buf + loc, data, v->data_size);
-}
+    if (v == NULL) return FAILURE;
 
-/*===========================================================================*/
-/* append                                                                    */
-/*===========================================================================*/
-void append(v, data)
-
-    vector*         v;
-    const void*     data;
-
-{
-    // reallocate more memory if the capacity is reached
-    if (v->count == v->capacity) {
-        printf("expanding...\n");
-        v->capacity = v->capacity * 2;
-        v->buf      = realloc(v->buf, sizeof(*v->buf) * v->capacity);
+    if (index < v->count)
+    {
+        v->buf[index] = data;
+        return SUCCESS;
     }
-    printf("adding %d to array...\n", data);
-    set(v, v->count++, data);
+    return FAILURE;
 }
 
-/*===========================================================================*/
-/* popback                                                                   */
-/*===========================================================================*/
-void* popback(v)
 
+int vector_pushback(v, data)
     vector*         v;
-
+    void*           data;
 {
-    void* result = get(v, --v->count);
-    return result;
+    if (v->count == v->capacity) vector_resize(v, v->capacity * 2);
+    return vector_set(v, v->count++, data);
 }
 
-/*===========================================================================*/
-/* contains                                                                  */
-/*===========================================================================*/
-BOOLEAN contains(v, data)
 
+int vector_pushfront(v, data)
     vector*         v;
-    const void*     data;
-
+    void*           data;
 {
-    if (find(v, data) == NOT_EXIST) {
-        return FALSE;
+    if (v == NULL) return FAILURE;
+
+    if (v->count == v->capacity) vector_resize(v, v->capacity * 2);
+
+    // shift the elements to make room at the front
+    for (size_t i = v->count; i > 0; i--) v->buf[i] = v->buf[i - 1];
+
+    vector_set(v, 0, data);
+    v->count++;
+    return SUCCESS;
+}
+
+
+void* vector_popback(v)
+    vector*         v;
+{
+    void* removed_item = vector_get(v, v->count - 1);
+    return removed_item;
+}
+
+
+void* vector_delete(v, index)
+    vector*         v;
+    size_t          index;
+{
+    if (v == NULL || index >= v->count) return NULL;
+
+    void* deleted_value = v->buf[index];
+    v->buf[index] = NULL;
+
+    // shift the elements to fill the gap
+    for (size_t i = index; i < v->count - 1; i++)
+    {
+        v->buf[i]       = v->buf[i + 1];
+        v->buf[i + 1]   = NULL;
     }
+    v->count--;
+
+    if (v->count > 0 && v->count == v->capacity / 4)
+    {
+        size_t new_capacity = v->count / 2;
+        if (new_capacity >= MIN_CAPACITY) vector_resize(v, new_capacity);
+    }
+    return deleted_value;
+}
+
+
+BOOLEAN vector_contains(v, data)
+    vector*         v;
+    void*           data;
+{
+    if (vector_find(v, data) == NOT_EXIST) return FALSE;
     return TRUE;
 }
 
-/*===========================================================================*/
-/* find                                                                      */
-/*===========================================================================*/
-int find(v, data)
 
+int vector_find(v, data)
     vector*         v;
-    const void*     data;
-
+    void*           data;
 {
     for (size_t i = 0; i < v->count; i++) {
-        if (get(v, i) == data) {
-            return i;
-        }
+        if (vector_get(v, i) == data) return i;
     }
     return NOT_EXIST;
+}
+
+
+int vector_free(v)
+    vector*         v;
+{
+    if (v == NULL) return FAILURE;
+
+    free(v->buf);
+    v->buf = NULL;
+    return SUCCESS;
+}
+
+
+//===========================================================================//
+//                          Helper Functions Definitions                     //
+//===========================================================================//
+
+size_t get_data_size(datatype)
+    DATATYPE        datatype;
+{
+    switch (datatype)
+    {
+    case INT:
+        return sizeof(int);
+    case UINT64:
+        return sizeof(unsigned long long);
+    case CHAR:
+        return sizeof(char);
+    default:
+        return 0;
+    }
+}
+
+
+int vector_resize(v, new_capacity)
+    vector*         v;
+    size_t          new_capacity;
+{
+    if (v == NULL) return FAILURE;
+
+    int     status  = FAILURE;
+    void**  buf     = realloc(v->buf, v->data_size * new_capacity);
+
+    if (buf)
+    {
+        v->buf      = buf;
+        v->capacity = new_capacity;
+        status      = SUCCESS;
+    }
+    return status;
 }

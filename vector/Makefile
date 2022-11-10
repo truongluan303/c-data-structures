@@ -1,11 +1,13 @@
+CC = gcc
+
 output: 	test.o vector.o
-	gcc test.o vector.o -o test
+	$(CC) test.o vector.o -o test
 
 test.o: 	test.c
-	gcc -c test.c
+	$(CC) -c test.c
 
 vector.o:	vector.c
-	gcc -c vector.c
+	$(CC) -c vector.c
 
 runtest:
 	make
@@ -14,6 +16,3 @@ runtest:
 memcheck:
 	make
 	valgrind ./test
-
-clean:
-	rm *.o test
