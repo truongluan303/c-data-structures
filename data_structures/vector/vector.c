@@ -78,8 +78,14 @@ int vector_pushfront(v, data)
 void* vector_popback(v)
     vector*         v;
 {
-    void* removed_item = vector_get(v, v->count - 1);
-    return removed_item;
+    return vector_delete(v, v->count - 1);
+}
+
+
+void* vector_popfront(v)
+    vector*         v;
+{
+    return vector_delete(v, 0);
 }
 
 
@@ -126,6 +132,15 @@ int vector_find(v, data)
         if (vector_get(v, i) == data) return i;
     }
     return NOT_EXIST;
+}
+
+
+void vector_clear(v)
+    vector*         v;
+{
+    free(v->buf);
+    v->buf      = malloc(sizeof(void*) * MIN_CAPACITY);
+    v->count    = 0;
 }
 
 

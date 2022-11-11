@@ -16,3 +16,8 @@ runtest:
 memcheck:
 	make
 	valgrind ./test
+
+
+clean:
+	rm *.o test
+

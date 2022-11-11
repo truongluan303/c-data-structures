@@ -19,16 +19,6 @@ typedef enum {
 BOOLEAN;
 
 /******************************************************************************
- * @brief       Represents the data type of the elements in the vector
-******************************************************************************/
-typedef enum {
-    INT,
-    UINT64,
-    CHAR
-}
-DATATYPE;
-
-/******************************************************************************
  * @brief       Represents the vector. Containing an array, the array's
  *              capacity, the actual elements count in the array, and the size
  *              of each data element.
@@ -73,11 +63,21 @@ int vector_set(vector* v, size_t index, void* data);
 /******************************************************************************
  * @brief       Add a new element to the end of the vector.
  * 
- * @param v             The vector to be initialized.
+ * @param v             The vector to be added to.
  * @param data          The data to be added.
+ *
+ * @return      0 if successful, 1 otherwise.
  *****************************************************************************/
 int vector_pushback(vector* v, void* data);
 
+/******************************************************************************
+ * @brief       Add a new element to the front of the vector.
+ *
+ * @param v             The vector to be added to.
+ * @param data          The data to be added.
+ *
+ * @return      0 if successful, 1 otherwise.
+ *****************************************************************************/
 int vector_pushfront(vector* v, void* data);
 
 /******************************************************************************
@@ -88,6 +88,15 @@ int vector_pushfront(vector* v, void* data);
  * @return      The data removed.
  *****************************************************************************/
 void* vector_popback(vector* v);
+
+/******************************************************************************
+ * @brief       Remove the element at the front of the vector.
+ *
+ * @param v             The vector to remove element from.
+ *
+ * @return      The data removed.
+ *****************************************************************************/
+void* vector_popfront(vector* v);
 
 /******************************************************************************
  * @brief       Remote the element at the given index.
@@ -111,7 +120,7 @@ void* vector_delete(vector* v, size_t index);
 BOOLEAN vector_contains(vector* v, void* data);
 
 /******************************************************************************
- * @brief       Find the location 
+ * @brief       Find the index of an element in a vector. 
  * 
  * @param v             The vector to be initialized
  * @param data_size     The size of each data element
@@ -120,6 +129,13 @@ BOOLEAN vector_contains(vector* v, void* data);
  *              given data does not exist.
  *****************************************************************************/
 int vector_find(vector* v, void* data);
+
+/******************************************************************************
+ * @brief       Empty the vector.
+ *
+ * @param v             The vector to be emptied.
+ *****************************************************************************/
+void vector_clear(vector* v);
 
 /******************************************************************************
  * @brief       Deallocates the memory allocated for the vector
