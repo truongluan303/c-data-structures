@@ -13,8 +13,8 @@
  * @brief       Represents a boolean state
  *****************************************************************************/
 typedef enum {
-    TRUE,
-    FALSE
+    FALSE,
+    TRUE
 }
 BOOLEAN;
 
@@ -37,7 +37,6 @@ typedef struct _vector {
     void**  buf;            /* the array */
     size_t  capacity;       /* the capacity of the array */
     size_t  count;          /* number of elements currently in the array */
-    size_t  data_size;      /* size of each data element */
 }
 vector;
 
@@ -45,11 +44,10 @@ vector;
  * @brief       Initialize a vector.
  * 
  * @param v             The vector to be initialized.
- * @param data_size     The size of the data type.
  * 
  * @return      0 if successful, 1 otherwise.
  *****************************************************************************/
-int construct_vector(vector* v, DATATYPE datatype);
+int construct_vector(vector* v);
 
 /******************************************************************************
  * @brief       Get the element at a given index in the vector.
@@ -107,7 +105,8 @@ void* vector_delete(vector* v, size_t index);
  * @param v             The vector to be searched.
  * @param data          The data to be searched.
  * 
- * @return      TRUE if the vector contains the given data, FALSE otherwise.
+ * @return      `TRUE` if the vector contains the given data, `FALSE`
+ *              otherwise.
  *****************************************************************************/
 BOOLEAN vector_contains(vector* v, void* data);
 

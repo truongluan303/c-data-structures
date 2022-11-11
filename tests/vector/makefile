@@ -6,8 +6,8 @@ output: 	test.o vector.o
 test.o: 	test.c
 	$(CC) -c test.c
 
-vector.o:	vector.c
-	$(CC) -c vector.c
+vector.o:	../../data_structures/vector/vector.c
+	$(CC) -c ../../data_structures/vector/vector.c
 
 runtest:
 	make

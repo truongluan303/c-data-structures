@@ -1,10 +1,10 @@
-#include "vector.h"
+#include "../../data_structures/vector/vector.h"
 #include <stdio.h>
 
-int main() 
+int main()
 {
     vector v;
-    construct_vector(&v, INT);
+    construct_vector(&v);
 
     vector_pushback(&v, (void*)1);
     vector_pushback(&v, (void*)2);

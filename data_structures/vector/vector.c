@@ -4,7 +4,6 @@
 //===========================================================================//
 //                          Helper Functions Prototypes                      //
 //===========================================================================//
-size_t  get_data_size(DATATYPE datatype);
 
 int     vector_resize(vector* v, size_t new_capacity);
 
@@ -13,17 +12,12 @@ int     vector_resize(vector* v, size_t new_capacity);
 //                          Vector Functions Definitions                     //
 //===========================================================================//
 
-int construct_vector(v, datatype)
+int construct_vector(v)
     vector*         v;
-    DATATYPE        datatype;
 {
-    size_t datasize = get_data_size(datatype);
-    if (datasize == 0) return FAILURE;
-
     v->capacity     = MIN_CAPACITY;
     v->count        = 0;
-    v->data_size    = datasize;
-    v->buf          = malloc(datasize * v->capacity);
+    v->buf          = malloc(sizeof(void*) * v->capacity);
 
     return SUCCESS;
 }
@@ -150,23 +144,6 @@ int vector_free(v)
 //                          Helper Functions Definitions                     //
 //===========================================================================//
 
-size_t get_data_size(datatype)
-    DATATYPE        datatype;
-{
-    switch (datatype)
-    {
-    case INT:
-        return sizeof(int);
-    case UINT64:
-        return sizeof(unsigned long long);
-    case CHAR:
-        return sizeof(char);
-    default:
-        return 0;
-    }
-}
-
-
 int vector_resize(v, new_capacity)
     vector*         v;
     size_t          new_capacity;
@@ -174,7 +151,7 @@ int vector_resize(v, new_capacity)
     if (v == NULL) return FAILURE;
 
     int     status  = FAILURE;
-    void**  buf     = realloc(v->buf, v->data_size * new_capacity);
+    void**  buf     = realloc(v->buf, sizeof(void*) * new_capacity);
 
     if (buf)
     {
