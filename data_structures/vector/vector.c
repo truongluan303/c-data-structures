@@ -5,7 +5,7 @@
 //                          Helper Functions Prototypes                      //
 //===========================================================================//
 
-int     vector_resize(vector* v, size_t new_capacity);
+int vector_resize(vector* v, size_t new_capacity);
 
 
 //===========================================================================//
@@ -40,8 +40,7 @@ int vector_set(v, index, data)
 {
     if (v == NULL) return FAILURE;
 
-    if (index < v->count)
-    {
+    if (index < v->count) {
         v->buf[index] = data;
         return SUCCESS;
     }
@@ -63,7 +62,6 @@ int vector_pushfront(v, data)
     void*           data;
 {
     if (v == NULL) return FAILURE;
-
     if (v->count == v->capacity) vector_resize(v, v->capacity * 2);
 
     // shift the elements to make room at the front
@@ -99,15 +97,13 @@ void* vector_delete(v, index)
     v->buf[index] = NULL;
 
     // shift the elements to fill the gap
-    for (size_t i = index; i < v->count - 1; i++)
-    {
+    for (size_t i = index; i < v->count - 1; i++) {
         v->buf[i]       = v->buf[i + 1];
         v->buf[i + 1]   = NULL;
     }
     v->count--;
 
-    if (v->count > 0 && v->count == v->capacity / 4)
-    {
+    if (v->count > 0 && v->count == v->capacity / 4) {
         size_t new_capacity = v->count / 2;
         if (new_capacity >= MIN_CAPACITY) vector_resize(v, new_capacity);
     }
@@ -139,8 +135,8 @@ void vector_clear(v)
     vector*         v;
 {
     free(v->buf);
-    v->buf      = malloc(sizeof(void*) * MIN_CAPACITY);
-    v->count    = 0;
+    v->buf          = malloc(sizeof(void*) * MIN_CAPACITY);
+    v->count        = 0;
 }
 
 
@@ -168,8 +164,7 @@ int vector_resize(v, new_capacity)
     int     status  = FAILURE;
     void**  buf     = realloc(v->buf, sizeof(void*) * new_capacity);
 
-    if (buf)
-    {
+    if (buf) {
         v->buf      = buf;
         v->capacity = new_capacity;
         status      = SUCCESS;
