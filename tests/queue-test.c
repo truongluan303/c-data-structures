@@ -1,4 +1,4 @@
-#include "linkedqueue.c"
+#include "data_structures/queue.h"
 
 /*===========================================================================*/
 /* main                     Perform tests on the queue implementations       */

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "../../data_structures/vector/vector.h"
+#include "data_structures/vector.h"
 
 
 int main()
@@ -58,4 +58,3 @@ int main()
     printf("=== All Passed! ===\n");
     return 0;
 }
-
