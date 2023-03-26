@@ -1,53 +1,30 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.0)
 
-set(OUTLIBNAME "${BASENAME}") # outfile name: lib${OUTLIBNAME}.so
-set(LIBNAME "${BASENAME}") # cmake target name
-set(LIBALIAS  "${BASENAME}") # import target name
+set(LIB_NAME data_structures)
 
-# Useful debug info if there are cmake linking issues.
-message(STATUS "CMake Target: ${LIBNAME}")
-message(STATUS "CMake Alias : ${LIBALIAS}")
-message(STATUS "Output File : lib${OUTLIBNAME}.[a|so]")
-
-project(${LIBNAME} C CXX)
-
+# Define the library sources and headers
 set(LIB_SOURCES
-    src/hashtable.c
-    src/queue.c
     src/vector.c
     )
 
-set_target_properties(${LIBNAME}
-    PROPERTIES
-    OUTPUT_NAME ${OUTLIBNAME}
-    # Aliases can be used in the same env but are not exportable.
-    EXPORT_NAME ${LIBALIAS}
+# Create the library target
+add_library(${LIB_NAME} SHARED ${LIB_SOURCES})
+
+# Set the library version and soname properties
+set_target_properties(${LIB_NAME} PROPERTIES
+    OUTPUT_NAME ${LIB_NAME}
+    EXPORT_NAME ${LIB_NAME}
     )
 
-target_include_directories(${LIBNAME}
-    PRIVATE
-    src
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include/>
+# Set the library include directories
+target_include_directories(${LIB_NAME}
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
-#########################
-# Install headers/cmake #
-#########################
-
-install(TARGETS ${LIBNAME}
-    EXPORT ${LIBNAME}_export
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+# Set the library installation directories
+install(TARGETS ${LIB_NAME}
+    LIBRARY DESTINATION lib
     )
-
-install(DIRECTORY "include/" DESTINATION include/ COMPONENT lib_data_structures_headers
+install(DIRECTORY "include/" DESTINATION include
     FILES_MATCHING PATTERN "*.h"
     )
-
-install(EXPORT ${LIBNAME}_export
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIBNAME}
-    FILE        ${LIBNAME}Targets.cmake
-    )
-
-install(FILES ${LIBNAME}Config.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${LIBNAME})
