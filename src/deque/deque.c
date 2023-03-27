@@ -156,10 +156,3 @@ int deque_contains(deque* d, void* value) {
     }
     return FALSE;
 }
-
-
-int deque_remove(deque* d, void* value) {
-    if (d == NULL) return FAILURE;
-
-    return SUCCESS;
-}
