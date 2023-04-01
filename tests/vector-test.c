@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "data_structures/vector.h"
+#include "vector.h"
 
 
 int main()

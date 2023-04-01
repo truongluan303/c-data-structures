@@ -1,30 +1,49 @@
-cmake_minimum_required(VERSION 3.0)
+# Specify the minimum version.
+cmake_minimum_required(VERSION 3.9)
 
-set(LIB_NAME data_structures)
+# Specify the project info.
+project(data_structures VERSION 1.0.0 DESCRIPTION "Data structures in C")
 
-# Define the library sources and headers
-set(LIB_SOURCES
-    src/vector.c
+# Declare the library target.
+add_library(${PROJECT_NAME} SHARED
+    src/data_structures.h
+    src/deque/deque.h
+    src/vector/vector.h
+    src/vector/vector.c
+)
+
+# Configure the directories to search for header files.
+target_include_directories(${PROJECT_NAME} PRIVATE source)
+
+# Set the version property.
+set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+
+# Set the shared object version property to the project's major version.
+set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+
+# Set the public header property to the one with the actual API.
+set(ALL_PUBLIC_HEADERS
+    "src/data_structures.h"
+    "src/deque/deque.h"
+    "src/vector/vector.h"
     )
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    PUBLIC_HEADER "${ALL_PUBLIC_HEADERS}"
+)
 
-# Create the library target
-add_library(${LIB_NAME} SHARED ${LIB_SOURCES})
+# For access to standard installation directory variables (CMAKE_INSTALL_xDIR).
+include(GNUInstallDirs)
 
-# Set the library version and soname properties
-set_target_properties(${LIB_NAME} PROPERTIES
-    OUTPUT_NAME ${LIB_NAME}
-    EXPORT_NAME ${LIB_NAME}
-    )
+# Set library shared object and API header file to install.
+install(TARGETS ${PROJECT_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
-# Set the library include directories
-target_include_directories(${LIB_NAME}
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-    )
+# Create the pkg-config file from the template.
+configure_file(src/${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
-# Set the library installation directories
-install(TARGETS ${LIB_NAME}
-    LIBRARY DESTINATION lib
-    )
-install(DIRECTORY "include/" DESTINATION include
-    FILES_MATCHING PATTERN "*.h"
-    )
+# Set pkg-config file to install.
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
