@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/src/deque/deque.c
+deque.h
+/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/src/deque/deque.h
+stdlib.h
+-
+stdio.h
+-
+
+/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/src/deque/deque.h
+

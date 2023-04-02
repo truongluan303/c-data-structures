@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libdata_structures.so.1 -o libdata_structures.so.1.0.0 CMakeFiles/data_structures.dir/src/deque/deque.c.o CMakeFiles/data_structures.dir/src/vector/vector.c.o 
