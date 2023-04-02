@@ -1,7 +1,0 @@
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/install/strip.dir
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/install/local.dir
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/install.dir
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/list_install_components.dir
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/hoang/Desktop/Workspace/data-structures-implementations-in-c/build/CMakeFiles/data_structures.dir
