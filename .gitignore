@@ -4,6 +4,7 @@
 
 # Object files
 *.o
+*.out
 *.ko
 *.obj
 *.elf
@@ -53,3 +54,11 @@ Mkfile.old
 dkms.conf
 
 build/
+
+# Files without extension
+*
+!/**/
+!*.*
+
+# VSCode stuff
+.vscode/

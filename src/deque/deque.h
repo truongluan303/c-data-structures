@@ -1,10 +1,10 @@
 #ifndef DEQUE_H
 #define DEQUE_H
 
-#define SUCCESS     0
-#define FAILURE     -1
-#define TRUE        1
-#define FALSE       0
+#define DEQUE_SUCCESS   0
+#define DEQUE_FAILURE   -1
+#define DEQUE_TRUE      1
+#define DEQUE_FALSE     0
 
 typedef struct _deque deque;
 
@@ -18,11 +18,11 @@ deque* deque_construct();
 /**
  * @brief Destroy a deque.
  *
- * @param d     The deque to be destroyed.
+ * @param d     Reference to the deque to be destroyed.
  * @return      DEQUE_SUCCESS if the destruction succeed,
  *              DEQUE_FAILURE otherwise.
  */
-int deque_destroy(deque* d);
+int deque_destroy(deque** d);
 
 /**
  * @brief Get number of elements in a deque.

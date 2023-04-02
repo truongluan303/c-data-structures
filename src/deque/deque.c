@@ -5,9 +5,9 @@
 
 typedef unsigned int uint;
 
-static const uint MIN_CAPACITY          = 32;
-static const uint INITIAL_FRONT_IDX     = -1;
-static const uint INITIAL_REAR_IDX      = 0;
+static const unsigned short MIN_CAPACITY    = 32;
+static const short INITIAL_FRONT_IDX        = -1;
+static const short INITIAL_REAR_IDX         = 0;
 
 
 typedef struct _deque {
@@ -20,7 +20,7 @@ typedef struct _deque {
 
 
 int deque_resize(deque* d, uint new_capacity) {
-    if (d == NULL) return FAILURE;
+    if (d == NULL) return DEQUE_FAILURE;
 
     void** current_data = malloc(sizeof(void*) * d->count);
     uint bufidx         = d->fidx;
@@ -30,16 +30,18 @@ int deque_resize(deque* d, uint new_capacity) {
     }
 
     void** buf = realloc(d->buf, sizeof(void*) * new_capacity);
-    if (!buf) return FAILURE;
+    if (!buf) return DEQUE_FAILURE;
 
     for (uint i = 0; i < d->count; i++) {
         buf[i] = current_data[i];
     }
+    free(current_data);
+
     d->buf      = buf;
     d->capacity = new_capacity;
     d->fidx     = 0;
     d->ridx     = d->count - 1;
-    return SUCCESS;
+    return DEQUE_SUCCESS;
 }
 
 
@@ -55,11 +57,13 @@ deque* deque_construct() {
 }
 
 
-int deque_destroy(deque* d) {
-    if (d == NULL) return FAILURE;
-    free(d->buf);
-    d->buf = NULL;
-    return SUCCESS;
+int deque_destroy(deque** d) {
+    if (d == NULL) return DEQUE_FAILURE;
+    free((*d)->buf);
+    (*d)->buf = NULL;
+    free(*d);
+    *d = NULL;
+    return DEQUE_SUCCESS;
 }
 
 
@@ -69,7 +73,7 @@ unsigned int deque_size(deque* d) {
 
 
 int deque_pushback(deque* d, void* value) {
-    if (d == NULL) return FAILURE;
+    if (d == NULL) return DEQUE_FAILURE;
     if (d->count == d->capacity) deque_resize(d, d->capacity * 2);
 
     if (d->count == 0) {
@@ -80,23 +84,23 @@ int deque_pushback(deque* d, void* value) {
     }
     d->buf[d->ridx] = value;
     d->count++;
-    return SUCCESS;
+    return DEQUE_SUCCESS;
 }
 
 
 int deque_pushfront(deque* d, void* value) {
-    if (d == NULL) return FAILURE;
+    if (d == NULL) return DEQUE_FAILURE;
     if (d->count == d->capacity) deque_resize(d, d->capacity * 2);
 
     if (d->count == 0) {
         d->fidx = 0;
     }
     else if (--d->fidx == -1) {
-        d->fidx = d->count - 1;
+        d->fidx = d->capacity - 1;
     }
     d->buf[d->fidx] = value;
     d->count++;
-    return SUCCESS;
+    return DEQUE_SUCCESS;
 }
 
 
@@ -112,7 +116,7 @@ void* deque_popback(deque* d) {
         d->ridx = INITIAL_REAR_IDX;
     }
     else if (--d->ridx == -1) {
-        d->ridx = d->count - 1;
+        d->ridx = d->capacity - 1;
     }
     if (d->count == d->capacity / 4) deque_resize(d, d->capacity / 2);
     return result;
@@ -126,7 +130,7 @@ void* deque_popfront(deque* d) {
 
     d->buf[d->fidx] = NULL;
     d->count--;
-    if (d->fidx == d->ridx) {
+    if (d->fidx == d->ridx) { // if the removed element is the only element in deque.
         d->fidx = INITIAL_FRONT_IDX;
         d->ridx = INITIAL_REAR_IDX;
     }
@@ -139,20 +143,23 @@ void* deque_popfront(deque* d) {
 
 
 void* deque_front(deque* d) {
-    return d != NULL ? d->buf[d->fidx] : NULL;
+    return (d != NULL && d->count > 0) ? d->buf[d->fidx] : NULL;
 }
 
 
 void* deque_back(deque* d) {
-    return d != NULL ? d->buf[d->ridx] : NULL;
+    return (d != NULL && d->count > 0) ? d->buf[d->ridx] : NULL;
 }
 
 
 int deque_contains(deque* d, void* value) {
-    if (d == NULL) return FAILURE;
+    if (d == NULL) return DEQUE_FAILURE;
 
-    for (uint i = 0; i < d->count; i++) {
-        if (d->buf[i] == value) return TRUE;
+    uint idx = d->fidx;
+
+    for (uint _ = 0; _ < d->count; _++) {
+        if (d->buf[idx] == value) return DEQUE_TRUE;
+        if (++idx == d->capacity) idx = 0;
     }
-    return FALSE;
+    return DEQUE_FALSE;
 }
