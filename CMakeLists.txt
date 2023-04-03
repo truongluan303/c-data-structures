@@ -8,6 +8,7 @@ project(data_structures VERSION 1.0.0 DESCRIPTION "Data structures in C")
 add_library(${PROJECT_NAME} SHARED
     src/data_structures.h
     src/deque/deque.h
+    src/deque/deque.c
     src/vector/vector.h
     src/vector/vector.c
 )
