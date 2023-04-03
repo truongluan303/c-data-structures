@@ -46,6 +46,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 /* global data used by macros */
 /* nothing in here should be modified directly */
