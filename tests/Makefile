@@ -1,4 +1,5 @@
 DEQUE		= deque-test
+MAP			= map-test
 VECTOR 		= vector-test
 
 CC 			= gcc
@@ -20,7 +21,8 @@ all: $(VECTOR) $(DEQUE)
 
 $(DEQUE): deque-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
-
+$(MAP): map-test.o
+	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 $(VECTOR): vector-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
@@ -32,6 +34,11 @@ test-deque:
 	make clean
 	make
 	./$(DEQUE)
+# run test for map
+test-map:
+	make clean
+	make
+	./$(MAP)
 # run test for vector
 test-vector:
 	make clean
