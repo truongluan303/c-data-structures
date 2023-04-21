@@ -20,7 +20,8 @@ all: $(VECTOR) $(DEQUE)
 
 $(DEQUE): deque-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
-
+$(TRIE): trie-test.o
+	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 $(VECTOR): vector-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
@@ -32,6 +33,11 @@ test-deque:
 	make clean
 	make
 	./$(DEQUE)
+# run test for trie
+test-trie:
+	make clean
+	make
+	./$(TRIE)
 # run test for vector
 test-vector:
 	make clean

@@ -2,6 +2,7 @@
 #define DATA_STRUCTURES_H
 
 #include "deque.h"
+#include "trie.h"
 #include "vector.h"
 
 #endif
