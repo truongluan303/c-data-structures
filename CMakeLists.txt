@@ -9,6 +9,8 @@ add_library(${PROJECT_NAME} SHARED
     src/data_structures.h
     src/deque/deque.h
     src/deque/deque.c
+    src/trie/trie.h
+    src/trie/trie.c
     src/vector/vector.h
     src/vector/vector.c
 )
@@ -26,6 +28,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJ
 set(ALL_PUBLIC_HEADERS
     "src/data_structures.h"
     "src/deque/deque.h"
+    "src/trie/trie.h"
     "src/vector/vector.h"
     )
 set_target_properties(${PROJECT_NAME} PROPERTIES
