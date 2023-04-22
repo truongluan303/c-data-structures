@@ -1,6 +1,8 @@
 #ifndef TRIE_H
 #define TRIE_H
 
+#include "vector.h"
+
 #define TRIE_SUCCESS    0
 #define TRIE_FAILURE    -1
 #define TRIE_TRUE       1
@@ -32,6 +34,6 @@ int trie_contains_prefix(trie* t, char* prefix);
 
 int trie_remove(trie* t, char* str);
 
-char** trie_get_with_prefix(trie* t, char* prefix);
+vector trie_get_strings_with_prefix(trie* t, char* prefix);
 
 #endif
