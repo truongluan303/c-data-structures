@@ -9,35 +9,54 @@ int vector_resize(vector* v, size_t new_capacity);
 
 
 //===========================================================================//
+//                          Vector Struct Definition                         //
+//===========================================================================//
+typedef struct _vector {
+    void**  buf;            /* the array */
+    size_t  capacity;       /* the capacity of the array */
+    size_t  count;          /* number of elements currently in the array */
+}
+vector;
+
+
+//===========================================================================//
 //                          Vector Functions Definitions                     //
 //===========================================================================//
 
-int construct_vector(v)
-    vector*         v;
-{
+vector* vector_construct() {
+    vector* v       = malloc(sizeof(v));
     v->capacity     = MIN_CAPACITY;
     v->count        = 0;
     v->buf          = malloc(sizeof(void*) * v->capacity);
 
+    return v;
+}
+
+
+size_t vector_size(vector* v) {
+    return v->count;
+}
+
+
+int vector_destroy(vector** v) {
+    if (v == NULL) return FAILURE;
+
+    free((*v)->buf);
+    (*v)->buf = NULL;
+    free(*v);
+    *v = NULL;
     return SUCCESS;
 }
 
 
-void* vector_get(v, index)
-    vector*         v;
-    size_t          index;
-{
+void* vector_get(vector* v, size_t index) {
     if (v == NULL) return NULL;
     if (index < v->count) return v->buf[index];
     return NULL;
 }
 
 
-int vector_set(v, index, data)
-    vector*         v;
-    size_t          index;
-    void*           data;
-{
+int vector_set(vector* v, size_t index, void* data) {
     if (v == NULL) return FAILURE;
 
     if (index < v->count) {
@@ -48,19 +67,13 @@ int vector_set(v, index, data)
 }
 
 
-int vector_pushback(v, data)
-    vector*         v;
-    void*           data;
-{
+int vector_pushback(vector* v, void* data) {
     if (v->count == v->capacity) vector_resize(v, v->capacity * 2);
     return vector_set(v, v->count++, data);
 }
 
 
-int vector_pushfront(v, data)
-    vector*         v;
-    void*           data;
-{
+int vector_pushfront(vector* v, void* data) {
     if (v == NULL) return FAILURE;
     if (v->count == v->capacity) vector_resize(v, v->capacity * 2);
 
@@ -73,24 +86,17 @@ int vector_pushfront(v, data)
 }
 
 
-void* vector_popback(v)
-    vector*         v;
-{
+void* vector_popback(vector* v) {
     return vector_delete(v, v->count - 1);
 }
 
 
-void* vector_popfront(v)
-    vector*         v;
-{
+void* vector_popfront(vector* v) {
     return vector_delete(v, 0);
 }
 
 
-void* vector_delete(v, index)
-    vector*         v;
-    size_t          index;
-{
+void* vector_delete(vector* v, size_t index) {
     if (v == NULL || index >= v->count) return NULL;
 
     void* deleted_value = v->buf[index];
@@ -111,19 +117,12 @@ void* vector_delete(v, index)
 }
 
 
-BOOLEAN vector_contains(v, data)
-    vector*         v;
-    void*           data;
-{
-    if (vector_find(v, data) == NOT_EXIST) return FALSE;
-    return TRUE;
+BOOLEAN vector_contains(vector* v, void* data) {
+    return vector_find(v, data) == NOT_EXIST ? FALSE : TRUE;
 }
 
 
-int vector_find(v, data)
-    vector*         v;
-    void*           data;
-{
+int vector_find(vector* v, void* data) {
     for (size_t i = 0; i < v->count; i++) {
         if (vector_get(v, i) == data) return i;
     }
@@ -131,23 +130,10 @@ int vector_find(v, data)
 }
 
 
-void vector_clear(v)
-    vector*         v;
-{
+void vector_clear(vector* v) {
     free(v->buf);
     v->buf          = malloc(sizeof(void*) * MIN_CAPACITY);
     v->count        = 0;
-}
-
-
-int vector_free(v)
-    vector*         v;
-{
-    if (v == NULL) return FAILURE;
-
-    free(v->buf);
-    v->buf = NULL;
-    return SUCCESS;
 }
 
 
@@ -155,10 +141,7 @@ int vector_free(v)
 //                          Helper Functions Definitions                     //
 //===========================================================================//
 
-int vector_resize(v, new_capacity)
-    vector*         v;
-    size_t          new_capacity;
-{
+int vector_resize(vector* v, size_t new_capacity) {
     if (v == NULL) return FAILURE;
 
     int     status  = FAILURE;
