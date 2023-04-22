@@ -19,25 +19,23 @@ typedef enum {
 BOOLEAN;
 
 /******************************************************************************
- * @brief       Represents the vector. Containing an array, the array's
- *              capacity, the actual elements count in the array, and the size
- *              of each data element.
+ * @brief       Represents the vector/list data structure.
  *****************************************************************************/
-typedef struct _vector {
-    void**  buf;            /* the array */
-    size_t  capacity;       /* the capacity of the array */
-    size_t  count;          /* number of elements currently in the array */
-}
-vector;
+typedef struct _vector vector;
 
 /******************************************************************************
- * @brief       Initialize a vector.
+ * @brief       Construct a new vector.
  *
- * @param v             The vector to be initialized.
- *
- * @return      0 if successful, 1 otherwise.
+ * @return      The newly constructed vector.
  *****************************************************************************/
-int construct_vector(vector* v);
+vector* vector_construct();
+
+/******************************************************************************
+ * @brief       Get the number of elements in a vector.
+ *
+ * @return      Number of elements in the given vector.
+ *****************************************************************************/
+size_t vector_size(vector* v);
 
 /******************************************************************************
  * @brief       Get the element at a given index in the vector.
@@ -142,6 +140,6 @@ void vector_clear(vector* v);
  *
  * @return      0 if successful, 1 otherwise
 ******************************************************************************/
-int vector_free(vector* v);
+int vector_destroy(vector** v);
 
 #endif
