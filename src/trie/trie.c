@@ -14,7 +14,7 @@ void deallocate_node(trie_node* node);
 trie_node* get_last_node_from_string(trie* t, char* str);
 
 
-typedef enum { TRUE, FALSE } boolean;
+typedef enum { FALSE, TRUE } boolean;
 
 
 typedef struct _trie_node {
@@ -82,9 +82,9 @@ int trie_remove(trie* t, char* str) {
 }
 
 
-char** trie_get_with_prefix(trie* t, char* prefix) {
-    // TODO: implement this
-    return NULL;
+vector trie_get_strings_with_prefix(trie* t, char* prefix) {
+    trie_node* curnode = get_last_node_from_string(t, prefix);
+    if (curnode == NULL) return NULL;
 }
 
 
@@ -110,6 +110,8 @@ void deallocate_node(trie_node* node) {
 
 
 trie_node* get_last_node_from_string(trie* t, char* str) {
+    if (t == NULL || str == NULL) return EXIT_FAILURE;
+
     unsigned char* ustr     = (unsigned char*)str;
     trie_node* curnode      = t->root;
     int strsize             = strlen(str);
