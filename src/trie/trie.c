@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NULL        0
 #define NUM_CHARS   256
 
 
@@ -82,7 +81,7 @@ int trie_remove(trie* t, char* str) {
 }
 
 
-vector trie_get_strings_with_prefix(trie* t, char* prefix) {
+vector* trie_get_strings_with_prefix(trie* t, char* prefix) {
     trie_node* curnode = get_last_node_from_string(t, prefix);
     if (curnode == NULL) return NULL;
 }

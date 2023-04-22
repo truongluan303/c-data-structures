@@ -34,6 +34,6 @@ int trie_contains_prefix(trie* t, char* prefix);
 
 int trie_remove(trie* t, char* str);
 
-vector trie_get_strings_with_prefix(trie* t, char* prefix);
+vector* trie_get_strings_with_prefix(trie* t, char* prefix);
 
 #endif
