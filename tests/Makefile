@@ -3,7 +3,7 @@ SINGLY_LINKED_LIST	= singly_linked_list-test
 VECTOR 				= vector-test
 
 CC 					= gcc
-CFLAGS 				= -g -Wall
+CFLAGS 				= -g -w
 
 RM 					= rm
 RMFLAGS 			= -f
