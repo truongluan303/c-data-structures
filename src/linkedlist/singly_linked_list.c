@@ -33,17 +33,15 @@ singly_linked_list* sllist_construct() {
 int sllist_destroy(singly_linked_list** list) {
     if (list == NULL) return SINGLY_LINKED_LIST_FAILURE;
 
-    singly_linked_node* head = (*list)->head;
-    singly_linked_node* tmp;
+    singly_linked_node* curnode = (*list)->head;
 
-    while (head != NULL) {
-        tmp = head;
-        head = head->next;
-        free(tmp);
+    while (curnode != NULL) {
+        singly_linked_node* nextnode = curnode->next;
+        free(curnode);
+        curnode = nextnode;
     }
     free(*list);
     *list = NULL;
-
     return SINGLY_LINKED_LIST_SUCCESS;
 }
 
@@ -91,11 +89,13 @@ singly_linked_node* sllist_insert_after_index(singly_linked_list* list,
                                               void* value) {
     if (list == NULL || index >= list->count) return NULL;
     if (list->count == 0) return sllist_pushfront(list, value);
+    if (index == list->count - 1) return sllist_pushback(list, value);
 
     singly_linked_node* node    = sllist_node_at(list, index);
     singly_linked_node* newnode = create_node(value);
     newnode->next               = node->next;
     node->next                  = newnode;
+
     list->count++;
     return newnode;
 }
@@ -105,6 +105,7 @@ singly_linked_node* sllist_insert_after_node(singly_linked_list* list,
                                              singly_linked_node* node,
                                              void* value) {
     if (list == NULL || node == NULL) return NULL;
+    if (node == list->tail) return sllist_pushback(list, value);
 
     singly_linked_node* newnode = create_node(value);
     newnode->next               = node->next;
@@ -164,26 +165,33 @@ void* sllist_popfront(singly_linked_list* list) {
     list->head                      = list->head->next;
     list->count--;
     free(front_node);
+
+    if (list->count == 0) {
+        list->head = NULL;
+        list->tail = NULL;
+    }
     return front_val;
 }
 
 
 void* sllist_remove_at(singly_linked_list* list, unsigned int index) {
     if (list == NULL || list->count == 0 || index >= list->count) return NULL;
-
     if (index == 0) return sllist_popfront(list);
 
-    singly_linked_node* curnode = list->head;
-    singly_linked_node* prevnode = NULL;
+    singly_linked_node* curnode     = sllist_node_at(list, index);
+    singly_linked_node* prevnode    = sllist_node_at(list, index - 1);
+    void* deleted_value             = curnode->value;
+    prevnode->next                  = curnode->next;
 
-    for (size_t i = 0; i < index; i++) {
-        prevnode        = curnode;
-        curnode         = curnode->next;
-    }
-    void* deleted_value = curnode->value;
-    prevnode->next      = curnode->next;
+    if (curnode == list->tail) list->tail = prevnode;
+
     free(curnode);
     list->count--;
+
+    if (list->count == 0) {
+        list->head = NULL;
+        list->tail = NULL;
+    }
     return deleted_value;
 }
 
@@ -195,14 +203,27 @@ void* sllist_remove_after_node(singly_linked_list* list,
     singly_linked_node* node_to_remove  = node->next;
     void* returned_value                = node_to_remove->value;
     node->next                          = node->next->next;
+
+    if (node_to_remove == list->tail) list->tail = node;
+
     free(node_to_remove);
     list->count--;
+
+    if (list->count == 0) {
+        list->head = NULL;
+        list->tail = NULL;
+    }
     return returned_value;
 }
 
 
 void* slnode_value(singly_linked_node* node) {
     return node->value;
+}
+
+
+singly_linked_node* slnode_next_node(singly_linked_node* node) {
+    return node->next;
 }
 
 
