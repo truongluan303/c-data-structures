@@ -1,24 +1,28 @@
-DEQUE		= deque-test
-VECTOR 		= vector-test
+DEQUE				= deque-test
+SINGLY_LINKED_LIST	= singly_linked_list-test
+VECTOR 				= vector-test
 
-CC 			= gcc
-CFLAGS 		= -g -Wall
+CC 					= gcc
+CFLAGS 				= -g -Wall
 
-RM 			= rm
-RMFLAGS 	= -f
+RM 					= rm
+RMFLAGS 			= -f
 
-LIBS 		= -ldata_structures
+LIBS 				= -ldata_structures
 
-TESTER_SRC	= tester/tester.c
+TESTER_SRC			= tester/tester.c
 
 # all target. for building the entire application.
 # - optional, because the first target in a Makefile is assumed to be the
 #   'all' target.
 # - marked phony, because it's just a recipe and not a file
 .PHONY: all
-all: $(VECTOR) $(DEQUE)
+all: $(DEQUE) $(SINGLY_LINKED_LIST) $(VECTOR)
 
 $(DEQUE): deque-test.o
+	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
+
+$(SINGLY_LINKED_LIST): singly_linked_list-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
 $(VECTOR): vector-test.o
@@ -32,6 +36,11 @@ test-deque:
 	make clean
 	make
 	./$(DEQUE)
+# run test for singly linked list
+test-singly-linked-list:
+	make clean
+	make
+	./$(SINGLY_LINKED_LIST)
 # run test for vector
 test-vector:
 	make clean
