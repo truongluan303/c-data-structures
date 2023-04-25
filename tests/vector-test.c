@@ -1,7 +1,6 @@
 #include "vector.h"
 #include "tester/tester.h"
 
-
 int main(int argc, char **argv)
 {
     tester_init();
