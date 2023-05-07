@@ -43,10 +43,28 @@ int main(int argc, char **argv)
     TEST(vector_popfront(v), (int*)0);
     TEST(vector_size(v), 2);
 
+    // test swap
+    void* val0 = vector_get(v, 0);
+    void* val1 = vector_get(v, 1);
+    vector_swap(v, 0, 1);
+    TEST(vector_get(v, 0), val1);
+    TEST(vector_get(v, 1), val0);
+
     // test clear
     vector_clear(v);
     TEST(vector_size(v), 0);
     TEST(vector_pushback(v, (void*)1), SUCCESS);
+
+    // test to array
+    vector_clear(v);
+    for (int i = 0; i < 10; i++) {
+        vector_pushback(v, (void*)i);
+    }
+    void** arr = vector_to_arr(v);
+    TEST_ASSERT(arr != NULL);
+    for (int i = 0; i < 10; i++) {
+        TEST(arr[i], i);
+    }
 
     // implicitly test vector resizing by adding and removing many elements
     for (size_t i = 0; i < 10000; i++) vector_pushback(v, (void*)i);
