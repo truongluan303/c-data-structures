@@ -136,6 +136,28 @@ int vector_find(vector* v, void* data);
 void vector_clear(vector* v);
 
 /******************************************************************************
+ * @brief       Swap the elements at given indices in the vector.
+ *
+ * @param v             The vector to swap elements.
+ * @param lidx          The left index.
+ * @param ridx          The right index.
+ *
+ * @return      0 if the swap is successful, 1 otherwise.
+ *****************************************************************************/
+int vector_swap(vector* v, size_t lidx, size_t ridx);
+
+/******************************************************************************
+ * @brief       Get an array representation of the vector. Since the result
+ *              array is dynamically allocated, make sure it is properly freed
+ *              after being used.
+ *
+ * @param v             The vector to get the array presentation for.
+ *
+ * @return      The array representation of the vector.
+ *****************************************************************************/
+void** vector_to_arr(vector* v);
+
+/******************************************************************************
  * @brief       Deallocates the memory allocated for the vector.
  *
  * @return      0 if successful, 1 otherwise

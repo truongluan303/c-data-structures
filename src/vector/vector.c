@@ -130,6 +130,25 @@ int vector_find(vector* v, void* data) {
 }
 
 
+int vector_swap(vector* v, size_t lidx, size_t ridx) {
+    if (v == NULL || lidx >= v->count || ridx >= v->count) return FAILURE;
+
+    void* temp      = v->buf[lidx];
+    v->buf[lidx]    = v->buf[ridx];
+    v->buf[ridx]    = temp;
+}
+
+
+void** vector_to_arr(vector* v) {
+    void** result = calloc(v->count, sizeof(void*));
+
+    for (size_t i = 0; i < v->count; i++) {
+        result[i] = v->buf[i];
+    }
+    return result;
+}
+
+
 void vector_clear(vector* v) {
     free(v->buf);
     v->buf          = malloc(sizeof(void*) * MIN_CAPACITY);
