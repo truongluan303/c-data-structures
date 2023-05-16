@@ -1,4 +1,5 @@
 DEQUE				= deque-test
+HASHMAP				= hashmap-test
 SINGLY_LINKED_LIST	= singly_linked_list-test
 VECTOR 				= vector-test
 
@@ -22,6 +23,9 @@ all: $(DEQUE) $(SINGLY_LINKED_LIST) $(VECTOR)
 $(DEQUE): deque-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
+$(HASHMAP): hashmap-test.o
+	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
+
 $(SINGLY_LINKED_LIST): singly_linked_list-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
@@ -36,6 +40,10 @@ test-deque:
 	make clean
 	make
 	./$(DEQUE)
+test-hashmap:
+	make clean
+	make
+	./$(HASHMAP)
 # run test for singly linked list
 test-singly-linked-list:
 	make clean
