@@ -1,104 +1,142 @@
 #include "hashmap.h"
 
+#include <limits.h>
 #include <stdlib.h>
+#include <time.h>
 
+#define INITIAL_CAPACITY    32
+#define MAX_CAPACITY        1<<31
 
-typedef struct _entry {
-    char*           key;
-    unsigned int    keylen;
-    void*           value;
-    struct entry*   next;
-} entry;
+//===========================================================================//
+//                              Struct Definitions                           //
+//===========================================================================//
 
+typedef struct _callbacks {
+    hashmap_keysequal   keq;
+    hashmap_keycopy     kcopy;
+    hashmap_keyfree     kfree;
+    hashmap_valcopy     vcopy;
+    hashmap_valfree     vfree;
+} callbacks;
+
+typedef struct _node {
+    void*   key;
+    void*   value;
+    node*   next;
+} node;
 
 typedef struct _hashmap {
-    unsigned int    size;
-    hashfunction*   hash;
-    entry**         elements;
+    hashfunction    hashfunc;
+    node**          heads;
+    size_t          size;
+    size_t          capacity;
+    size_t          seed;
+    callbacks       cbs;
 } hashmap;
 
+typedef struct _hashmap_iterator {
+    hashmap*    hmap;
+    node*       cur;
+    size_t      idx;
+} hashmap_iterator;
 
-static unsigned int hashmap_index(hashmap* hmap, const char* key) {
-    return hmap->hash(key, strlen(key)) % hmap->size;
+
+//===========================================================================//
+//                         Private Helper Functions                          //
+//===========================================================================//
+
+static void* default_copy(void* x) { return x; }
+
+static void default_free(void* v) { return; }
+
+static void rehash(hashmap* hmap) {
+    if (hmap->size + 1 < (size_t)(hmap->capacity * 0.75) ||
+        hmap->capacity >= MAX_CAPACITY) return;
+
+    size_t capacity = hmap->capacity;
+    node** heads    = hmap->heads;
+
+    hmap->capacity  <<= 1;
+    hmap->heads     = realloc(hmap->heads, sizeof(void*) * hmap->capacity);
 }
 
-hashmap* hashmap_construct(unsigned int size, hashfunction* hash) {
+static void add_to_bucket(hashmap* hmap, void* key, void* val, bool isrehash) {
+}
+
+//===========================================================================//
+//                            Function Definitions                           //
+//===========================================================================//
+
+hashmap* hashmap_construct(hashfunction hash, hashmap_keysequal keq) {
+    if (hash == NULL || keq == NULL) return NULL;
+
     hashmap* hmap   = malloc(sizeof(*hmap));
-    hmap->size      = size;
-    hmap->hash      = hash;
-    hmap->elements  = calloc(sizeof(entry*), hmap->size);
+
+    hmap->size      = 0;
+    hmap->capacity  = INITIAL_CAPACITY;
+    hmap->hashfunc  = hash;
+    hmap->heads     = calloc(hmap->capacity, sizeof(*hmap->heads));
+
+    hmap->cbs.keq   = keq;
+    hmap->cbs.kcopy = default_copy;
+    hmap->cbs.vcopy = default_copy;
+    hmap->cbs.kfree = default_free;
+    hmap->cbs.vfree = default_free;
+
+    hmap->seed      = (size_t)time(NULL);
+    hmap->seed      ^= ((size_t)hashmap_construct << 16) | (size_t)hmap;
+    hmap->seed      ^= (size_t)&hmap->seed;
+
     return hmap;
+}
+
+int hashmap_set_callbacks(hashmap* hmap,
+                          hashmap_keycopy kcopy,
+                          hashmap_keyfree kfree,
+                          hashmap_valcopy vcopy,
+                          hashmap_valfree vfree) {
+    if (hmap == NULL) return HASHMAP_FAILURE;
+
+    hmap->cbs.kcopy = kcopy;
+    hmap->cbs.kfree = kfree;
+    hmap->cbs.vcopy = vcopy;
+    hmap->cbs.vfree = vfree;
+    return HASHMAP_SUCCESS;
 }
 
 int hashmap_destroy(hashmap** hmap) {
     if (*hmap == NULL) return HASHMAP_FAILURE;
 
-    free((*hmap)->elements);
+    for (size_t i = 0; i < (*hmap)->capacity; i++) {
+        if ((*hmap)->heads[i] == NULL ||
+            (*hmap)->heads[i]->key == NULL) continue;
+
+        node* curr = (*hmap)->heads[i];
+        node* next = NULL;
+        do {
+            (*hmap)->cbs.kfree(curr->key);
+            (*hmap)->cbs.vfree(curr->value);
+            next = curr->next;
+            free(curr);
+            curr = next;
+        } while(curr != NULL);
+    }
+    free((*hmap)->heads);
     free(*hmap);
+
     *hmap = NULL;
-
     return HASHMAP_SUCCESS;
 }
 
-int hashmap_insert(hashmap* hmap, const char* key, void* value) {
+int hashmap_insert(hashmap* hmap, void* key, void* value) {
     if (hmap == NULL || key == NULL) return HASHMAP_FAILURE;
 
-    unsigned int index = hashmap_index(hmap, key);
+    rehash(hmap);
 
-    if (hashmap_contains(hmap, key)) return HASHMAP_FAILURE;
-
-    // create a new entry
-    entry* e    = malloc(sizeof(*e));
-    e->value    = value;
-    e->key      = malloc(strlen(key) + 1);
-    strcpy(e->key, key);
-
-    // insert entry
-    e->next                 = hmap->elements[index];
-    hmap->elements[index]   = e;
-
-    return HASHMAP_SUCCESS;
 }
 
-int hashmap_contains(hashmap* hmap, const char* key) {
-    if (hmap == NULL || key == NULL) return HASHMAP_FAILURE;
+int hashmap_contains(hashmap* hmap, void* key);
 
-    void* _;
-    return hashmap_get(hmap, key, &_) != NULL ? HASHMAP_TRUE : HASHMAP_FALSE;
-}
+int hashmap_remove(hashmap* hmap, void* key);
 
-int hashmap_remove(hashmap* hmap, const char* key) {
-    if (hmap == NULL || key == NULL) return HASHMAP_FAILURE;
-
-    unsigned int index = hashmap_index(hmap, key);
-
-    entry* tmp  = hmap->elements[index];
-    entry* prev = NULL;
-    while (tmp != NULL && strcmp(tmp->key, key) != 0) {
-        prev    = tmp;
-        tmp     = tmp->next;
-    }
-    if (tmp == NULL) return HASHMAP_FAILURE;
-
-    if (prev == NULL) { // if the to-be-remove node is the head of the list
-        hmap->elements[index] = tmp->next;
-    } else {
-        prev->next = tmp->next;
-    }
-    return HASHMAP_SUCCESS;
-}
-
-int hashmap_get(hashmap* hmap, const char* key, void** value) {
-    if (hmap == NULL || key == NULL) return HASHMAP_FAILURE;
-
-    unsigned int index = hashmap_index(hmap, key);
-
-    entry* tmp = hmap->elements[index];
-    while (tmp != NULL && strcmp(tmp->key, key) != 0) {
-        tmp = tmp->next;
-    }
-    if (tmp == NULL) return HASHMAP_FAILURE;
-
-    *value = tmp->value;
-    return HASHMAP_SUCCESS;
-}
+int hashmap_get(hashmap* hmap, void* key, void** outvalue);
