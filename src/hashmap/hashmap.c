@@ -12,26 +12,26 @@
 //===========================================================================//
 
 typedef struct _callbacks {
-    hashmap_keysequal   keq;
-    hashmap_keycopy     kcopy;
-    hashmap_keyfree     kfree;
-    hashmap_valcopy     vcopy;
-    hashmap_valfree     vfree;
+    hashmap_keysequal   keq;    // Callback to check if keys equal.
+    hashmap_keycopy     kcopy;  // Callback to copy a key.
+    hashmap_keyfree     kfree;  // Callback to free a key on deletion.
+    hashmap_valcopy     vcopy;  // Callback to copy a value.
+    hashmap_valfree     vfree;  // Callback to free a value on deletion.
 } callbacks;
 
 typedef struct _node {
-    void*   key;
-    void*   value;
-    node*   next;
+    void*           key;
+    void*           value;
+    struct _node*   next;
 } node;
 
 typedef struct _hashmap {
-    hashfunction    hashfunc;
-    node**          heads;
-    size_t          size;
-    size_t          capacity;
-    size_t          seed;
-    callbacks       cbs;
+    hashfunction    hashfunc;   // The hash function.
+    node**          heads;      // The bucket array.
+    size_t          size;       // Number of key-value pairs in the map.
+    size_t          capacity;   // Number of buckets.
+    size_t          seed;       // The seed.
+    callbacks       cbs;        // The callback functions
 } hashmap;
 
 typedef struct _hashmap_iterator {
@@ -49,6 +49,10 @@ static void* default_copy(void* x) { return x; }
 
 static void default_free(void* v) { return; }
 
+static size_t get_bucket_index(hashmap* hmap, void* key) {
+    return hmap->hashfunc(key, hmap->seed) % hmap->capacity;
+}
+
 static void rehash(hashmap* hmap) {
     if (hmap->size + 1 < (size_t)(hmap->capacity * 0.75) ||
         hmap->capacity >= MAX_CAPACITY) return;
@@ -57,10 +61,8 @@ static void rehash(hashmap* hmap) {
     node** heads    = hmap->heads;
 
     hmap->capacity  <<= 1;
-    hmap->heads     = realloc(hmap->heads, sizeof(void*) * hmap->capacity);
-}
-
-static void add_to_bucket(hashmap* hmap, void* key, void* val, bool isrehash) {
+    hmap->heads     = (node**)realloc(hmap->heads,
+                                      sizeof(void*) * hmap->capacity);
 }
 
 //===========================================================================//
@@ -70,12 +72,12 @@ static void add_to_bucket(hashmap* hmap, void* key, void* val, bool isrehash) {
 hashmap* hashmap_construct(hashfunction hash, hashmap_keysequal keq) {
     if (hash == NULL || keq == NULL) return NULL;
 
-    hashmap* hmap   = malloc(sizeof(*hmap));
+    hashmap* hmap   = (hashmap*)malloc(sizeof(*hmap));
 
     hmap->size      = 0;
     hmap->capacity  = INITIAL_CAPACITY;
     hmap->hashfunc  = hash;
-    hmap->heads     = calloc(hmap->capacity, sizeof(*hmap->heads));
+    hmap->heads     = (node**)calloc(hmap->capacity, sizeof(*hmap->heads));
 
     hmap->cbs.keq   = keq;
     hmap->cbs.kcopy = default_copy;
@@ -108,8 +110,7 @@ int hashmap_destroy(hashmap** hmap) {
     if (*hmap == NULL) return HASHMAP_FAILURE;
 
     for (size_t i = 0; i < (*hmap)->capacity; i++) {
-        if ((*hmap)->heads[i] == NULL ||
-            (*hmap)->heads[i]->key == NULL) continue;
+        if ((*hmap)->heads[i] == NULL) continue;
 
         node* curr = (*hmap)->heads[i];
         node* next = NULL;
@@ -133,10 +134,112 @@ int hashmap_insert(hashmap* hmap, void* key, void* value) {
 
     rehash(hmap);
 
+    size_t index = get_bucket_index(hmap, key);
+
+    if (hashmap_contains(hmap, key)) return HASHMAP_FAILURE;
+
+    node* n             = (node*)malloc(sizeof(*n));
+    n->value            = value;
+    n->key              = key;
+    n->next             = hmap->heads[index];
+    hmap->heads[index]  = n;
+    hmap->size++;
+
+    return HASHMAP_SUCCESS;
 }
 
-int hashmap_contains(hashmap* hmap, void* key);
+int hashmap_contains(hashmap* hmap, void* key) {
+    void* _;
+    return hashmap_get(hmap, key, &_) == HASHMAP_SUCCESS;
+}
 
-int hashmap_remove(hashmap* hmap, void* key);
+int hashmap_remove(hashmap* hmap, void* key) {
+    if (hmap == NULL || key == NULL) return HASHMAP_FAILURE;
 
-int hashmap_get(hashmap* hmap, void* key, void** outvalue);
+    size_t index = get_bucket_index(hmap, key);
+
+    node* curr = hmap->heads[index];
+    node* prev = NULL;
+    while (curr != NULL && !hmap->cbs.keq(curr->key, key)) {
+        curr = curr->next;
+    }
+    if (curr == NULL) return HASHMAP_FAILURE;
+
+    if (prev == NULL) { // if the node to be deleted is the head of the list
+        hmap->heads[index] = curr->next;
+    } else {
+        prev->next = curr->next;
+    }
+
+    // free the deleted node
+    hmap->cbs.kfree(curr->key);
+    hmap->cbs.vfree(curr->value);
+    free(curr);
+
+    hmap->size--;
+    return HASHMAP_SUCCESS;
+}
+
+int hashmap_get(hashmap* hmap, void* key, void** outvalue) {
+    if (hmap == NULL || key == NULL) return HASHMAP_FAILURE;
+
+    size_t index = get_bucket_index(hmap, key);
+
+    node* tmp = hmap->heads[index];
+    while (tmp != NULL && !hmap->cbs.keq(tmp->key, key)) tmp = tmp->next;
+    if (tmp == NULL) return HASHMAP_FAILURE;
+
+    *outvalue = tmp->value;
+
+    return HASHMAP_SUCCESS;
+}
+
+size_t hashmap_size(hashmap* hmap) {
+    return hmap->size;
+}
+
+void** hashmap_keys(hashmap* hmap) {
+    if (hmap == NULL || hmap->size == 0) return HASHMAP_FAILURE;
+
+    void** result = calloc(hmap->size, sizeof(void*));
+
+    size_t i    = 0;
+    node* curr  = NULL;
+
+    for (size_t bucket_idx = 0; bucket_idx < hmap->capacity; bucket_idx++) {
+        curr = hmap->heads[bucket_idx];
+        while (curr != NULL) result[i++] = curr->key;
+    }
+    return result;
+}
+
+void** hashmap_values(hashmap* hmap) {
+    if (hmap == NULL || hmap->size == 0) return HASHMAP_FAILURE;
+
+    void** result = calloc(hmap->size, sizeof(void*));
+
+    size_t i    = 0;
+    node* curr  = NULL;
+
+    for (size_t bucket_idx = 0; bucket_idx < hmap->capacity; bucket_idx++) {
+        curr = hmap->heads[bucket_idx];
+        while (curr != NULL) result[i++] = curr->value;
+    }
+    return result;
+}
+
+hashmap_pair* hashmap_items(hashmap* hmap) {
+    if (hmap == NULL || hmap->size == 0) return HASHMAP_FAILURE;
+
+    hashmap_pair* result = calloc(hmap->size, sizeof(hashmap_pair));
+
+    size_t i    = 0;
+    node* curr  = NULL;
+
+    for (size_t bucket_idx = 0; bucket_idx < hmap->capacity; bucket_idx++) {
+        curr = hmap->heads[bucket_idx];
+        hashmap_pair pair = { curr->key, curr->value };
+        while (curr != NULL) result[i++] = pair;
+    }
+    return result;
+}
