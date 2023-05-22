@@ -17,8 +17,6 @@ typedef struct _hashmap hashmap;
 
 typedef struct _hashmap_iterator hashmap_iterator;
 
-typedef struct _hashmap_pair { void* key; void* value; } hashmap_pair;
-
 //===========================================================================//
 //                                Call Backs                                 //
 //===========================================================================//
@@ -49,7 +47,7 @@ int hashmap_set_callbacks(hashmap* hmap,
 
 int hashmap_destroy(hashmap** hmap);
 
-int hashmap_insert(hashmap* hmap, void* key, void* value);
+int hashmap_set(hashmap* hmap, void* key, void* value);
 
 int hashmap_contains(hashmap* hmap, void* key);
 
@@ -57,13 +55,13 @@ int hashmap_remove(hashmap* hmap, void* key);
 
 int hashmap_get(hashmap* hmap, void* key, void** outvalue);
 
-size_t hashmap_size(hashmap* hmap);
+unsigned long hashmap_size(hashmap* hmap);
+
+int hashmap_clear(hashmap* hmap);
 
 void** hashmap_keys(hashmap* hmap);
 
 void** hashmap_values(hashmap* hmap);
-
-hashmap_pair* hashmap_items(hashmap* hmap);
 
 //===========================================================================//
 //                                Enumeration                                //
