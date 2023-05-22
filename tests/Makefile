@@ -19,7 +19,7 @@ TESTER_SRC			= tester/tester.c
 #   'all' target.
 # - marked phony, because it's just a recipe and not a file
 .PHONY: all
-all: $(DEQUE) $(SINGLY_LINKED_LIST) $(TRIE) $(VECTOR)
+all: $(DEQUE) $(HASHMAP) $(SINGLY_LINKED_LIST) $(TRIE) $(VECTOR)
 
 $(DEQUE): deque-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
