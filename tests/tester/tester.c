@@ -5,18 +5,14 @@
 struct tester_global_data TesterData;
 
 
-static void
-tester_sighandler(int signal)
-{
+static void tester_sighandler(int signal) {
     if (TesterData.escape_hatch_active) {
         TesterData.escape_hatch_active = 0;
         longjmp(TesterData.escape_hatch, signal);
     }
 }
 
-void
-tester_init(void)
-{
+void tester_init(void) {
     TesterData.escape_hatch_active = 0;
     TesterData.tests = 0;
     TesterData.errors = 0;
@@ -31,11 +27,10 @@ tester_init(void)
     signal(SIGABRT, tester_sighandler);
 }
 
-void
-tester_report(FILE *f, const char *preamble)
-{
+void tester_report(FILE *f, const char *preamble) {
     if (TesterData.errors != 0 || TesterData.signals != 0) {
-        fprintf(f, "%s: errors %d/%d, signals %d, FAILs %d\n",
+        fprintf(f,
+                "%s: errors %d/%d, signals %d, FAILs %d\n",
                 preamble,
                 TesterData.errors,
                 TesterData.tests,
@@ -46,14 +41,10 @@ tester_report(FILE *f, const char *preamble)
     }
 }
 
-int
-tester_result(void)
-{
+int tester_result(void) {
     return TesterData.errors;
 }
 
-void
-tester_set_time_limit(int t)
-{
+void tester_set_time_limit(int t) {
     TesterData.time_limit = t;
 }

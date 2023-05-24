@@ -11,6 +11,8 @@ add_library(${PROJECT_NAME} SHARED
     src/deque/deque.c
     src/trie/trie.h
     src/trie/trie.c
+    src/linkedlist/singly_linked_list.h
+    src/linkedlist/singly_linked_list.c
     src/vector/vector.h
     src/vector/vector.c
 )
@@ -29,6 +31,7 @@ set(ALL_PUBLIC_HEADERS
     "src/data_structures.h"
     "src/deque/deque.h"
     "src/trie/trie.h"
+    "src/linkedlist/singly_linked_list.h"
     "src/vector/vector.h"
     )
 set_target_properties(${PROJECT_NAME} PROPERTIES

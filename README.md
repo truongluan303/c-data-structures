@@ -1,19 +1,24 @@
-# data-structures-implementations-in-c
- Include the implementations of data structures in C programming language.
+# C Data Structures Library
+An implementation of popular data structures in C programming language.
 
-### Build & Install The Shared Library
-Run the `build.sh` script of manually perform the following commands:
+## Build & Install The Shared Library
+Run the `build.sh` script to automatically build and install the library.
+
+If the script fails, manually perform the following commands:
+
+Create a directory for building the project
 ```bash
-# Create a build directory and move into it
-mkdir build
-cd build
-
-# Generate the Makefile using CMake
+mkdir build && cd build
+```
+Generate the Makefile using CMake
+```bash
 cmake ..
-
-# Build the library
+```
+Build the library
+```bash
 make all
-
-# Install the library system-wide
+```
+Install the library system-wide
+```bash
 sudo make install
 ```
