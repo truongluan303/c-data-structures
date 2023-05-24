@@ -146,6 +146,6 @@ vector* trie_get_strings_with_prefix(trie* t, char* prefix) {
         //     vector_pushback(result, (void*))
         // }
     }
-    deque_destroy(node_queue);
-    deque_destroy(prefix_queue);
+    deque_destroy(&node_queue);
+    deque_destroy(&prefix_queue);
 }
