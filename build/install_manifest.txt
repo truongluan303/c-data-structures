@@ -1,9 +1,0 @@
-/usr/local/lib/libdata_structures.so.1.0.0
-/usr/local/lib/libdata_structures.so.1
-/usr/local/lib/libdata_structures.so
-/usr/local/include/data_structures.h
-/usr/local/include/deque.h
-/usr/local/include/trie.h
-/usr/local/include/singly_linked_list.h
-/usr/local/include/vector.h
-/usr/local/lib/pkgconfig/data_structures.pc
