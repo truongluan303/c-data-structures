@@ -69,12 +69,17 @@ trie* trie_construct() {
     trie* newtrie   = malloc(sizeof(*newtrie));
     newtrie->root   = create_node();
     newtrie->count  = 0;
+    return newtrie;
 }
 
 int trie_destroy(trie** t) {
+    if (t == NULL || *t == NULL) return TRIE_FAILURE;
+
     deallocate_node((*t)->root);
     free(*t);
     *t = NULL;
+
+    return TRIE_SUCCESS;
 }
 
 int trie_add(trie* t, char* str) {
@@ -82,9 +87,9 @@ int trie_add(trie* t, char* str) {
 
     unsigned char* ustr     = (unsigned char*)str;
     trie_node* curnode      = t->root;
-    int strsize             = strlen(str);
+    unsigned int strsize    = strlen(str);
 
-    for (int i = 0; i < strsize; i++) {
+    for (unsigned int i = 0; i < strsize; i++) {
         if (curnode->children[ustr[i]] == NULL) {
             curnode->children[ustr[i]] = create_node();
         }
@@ -94,14 +99,14 @@ int trie_add(trie* t, char* str) {
 }
 
 int trie_contains(trie* t, char* str) {
-    if (t == NULL || t->root == NULL) return EXIT_FAILURE;
+    if (t == NULL || t->root == NULL) return TRIE_FAILURE;
 
     trie_node* lastnode = get_last_node_from_string(t, str);
     return lastnode != NULL ? lastnode->is_terminal : TRIE_FALSE;
 }
 
 int trie_contains_prefix(trie* t, char* prefix) {
-    if (t == NULL || t->root == NULL) return EXIT_FAILURE;
+    if (t == NULL || t->root == NULL) return TRIE_FAILURE;
 
     trie_node* lastnode = get_last_node_from_string(t, prefix);
     return lastnode != NULL ? TRIE_TRUE : TRIE_FALSE;

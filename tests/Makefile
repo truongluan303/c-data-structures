@@ -1,5 +1,6 @@
 DEQUE				= deque-test
 SINGLY_LINKED_LIST	= singly_linked_list-test
+TRIE				= trie-test
 VECTOR 				= vector-test
 
 CC 					= gcc
@@ -17,15 +18,15 @@ TESTER_SRC			= tester/tester.c
 #   'all' target.
 # - marked phony, because it's just a recipe and not a file
 .PHONY: all
-all: $(DEQUE) $(SINGLY_LINKED_LIST) $(VECTOR)
+all: $(DEQUE) $(SINGLY_LINKED_LIST) $(TRIE) $(VECTOR)
 
 $(DEQUE): deque-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
-$(TRIE): trie-test.o
+$(SINGLY_LINKED_LIST): singly_linked_list-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
-$(SINGLY_LINKED_LIST): singly_linked_list-test.o
+$(TRIE): trie-test.o
 	$(CC) $(CFLAGS) -o $@ $^ $(TESTER_SRC) $(LIBS)
 
 $(VECTOR): vector-test.o
