@@ -16,7 +16,7 @@ typedef struct _trie_node {
 
 typedef struct _trie {
     trie_node*          root;
-    size_t              count;
+    unsigned int        count;
 } trie;
 
 
@@ -55,12 +55,6 @@ static trie_node* get_last_node_from_string(trie* t, char* str) {
     return curnode;
 }
 
-// static trie_node* remove_str_rec(trie_node* node,
-//                                  unsigned char* str,
-//                                  bool* deleted) {
-
-// }
-
 //===========================================================================//
 //                          Functions Implementations                        //
 //===========================================================================//
@@ -95,6 +89,9 @@ int trie_add(trie* t, char* str) {
         }
         curnode = curnode->children[ustr[i]];
     }
+    curnode->is_terminal = true;
+    t->count++;
+
     return TRIE_SUCCESS;
 }
 
@@ -112,45 +109,11 @@ int trie_contains_prefix(trie* t, char* prefix) {
     return lastnode != NULL ? TRIE_TRUE : TRIE_FALSE;
 }
 
-int trie_remove(trie* t, char* str) {
-    if (t == NULL || t->root == NULL || str == NULL) return TRIE_FAILURE;
-
-    unsigned char* ustr = (unsigned char*)str;
-
-    return 0;
+int trie_is_empty(trie* t) {
+    if (t == NULL) return TRIE_FAILURE;
+    return t->count == 0 ? TRIE_TRUE : TRIE_FALSE;
 }
 
-vector* trie_get_strings_with_prefix(trie* t, char* prefix) {
-    trie_node* curnode = get_last_node_from_string(t, prefix);
-    if (curnode == NULL) return NULL;
-
-    vector* result = vector_construct();
-
-    deque* node_queue = deque_construct();
-    deque* prefix_queue = deque_construct();
-    deque_pushback(node_queue, (void*)curnode);
-    deque_pushback(prefix_queue, (void*)prefix);
-
-    while(deque_size(node_queue) > 0) {
-        curnode = (trie_node*)deque_popfront(node_queue);
-        char* cur_prefix = (char*)deque_popfront(prefix_queue);
-
-        for (unsigned short i = 0; i < NUM_CHARS; i++) {
-            if (curnode->children[i] == NULL) continue;
-
-            // size_t cur_prefix_len   = strlen(cur_prefix);
-            // char* next_prefix       = malloc(cur_prefix_len + 1);
-
-            // strcpy(next_prefix, cur_prefix);
-            // next_prefix[cur_prefix_len] = i;
-
-            // deque_pushback(node_queue, (void*)curnode->children[i]);
-            // deque_pushback(prefix_queue, (void*)next_prefix);
-        }
-        // if (curnode->is_terminal == true) {
-        //     vector_pushback(result, (void*))
-        // }
-    }
-    deque_destroy(&node_queue);
-    deque_destroy(&prefix_queue);
+long trie_size(trie* t) {
+    return t == NULL ? TRIE_FAILURE : t->count;
 }
