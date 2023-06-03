@@ -1,5 +1,37 @@
 #include "vector.h"
+
+#include <time.h>
+
 #include "tester/tester.h"
+
+
+void test_vector_sort() {
+    vector* v;
+    TRY { v = vector_construct(); } ENDTRY;
+    srand(time(NULL));
+
+    for (size_t _ = 0; _ < 100; _++) {
+        vector_pushback(v, (void*)rand());
+    }
+    vector_sort(v);
+    for (size_t i = 1; i < 100; i++) {
+        TEST_ASSERT(vector_get(v, i - 1) <= vector_get(v, i));
+    }
+
+    vector_destroy(&v);
+    TRY { v = vector_construct(); } ENDTRY;
+
+    for (size_t _ = 0; _ < 10000; _++) {
+        vector_pushback(v, (void*)rand());
+    }
+    vector_sort(v);
+    for (size_t i = 1; i < 10000; i++) {
+        TEST_ASSERT(vector_get(v, i - 1) <= vector_get(v, i));
+    }
+
+    vector_destroy(&v);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -49,10 +81,22 @@ int main(int argc, char **argv)
     TEST(vector_pushback(v, (void*)1), SUCCESS);
 
     // implicitly test vector resizing by adding and removing many elements
-    for (size_t i = 0; i < 10000; i++) vector_pushback(v, (void*)i);
-    for (size_t _ = 0; _ < 5000; _++) vector_popback(v);
+    vector_clear(v);
+    for (size_t i = 0; i < 10000; i++) {
+        vector_pushback(v, (void*)i);
+    }
+    for (size_t i = 0; i < 10000; i++) {
+        TEST(vector_get(v, i), i);
+    }
+    for (size_t _ = 0; _ < 5000; _++) {
+        vector_popback(v);
+    }
+    vector_clear(v);
 
     vector_destroy(&v);
+    TEST(v, NULL);
+
+    test_vector_sort();
 
     tester_report(stdout, argv[0]);
     return tester_result();

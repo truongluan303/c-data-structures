@@ -5,7 +5,9 @@
 //                          Helper Functions Prototypes                      //
 //===========================================================================//
 
-int vector_resize(vector* v, size_t new_capacity);
+static int vector_resize(vector* v, size_t new_capacity);
+
+static void merge_sort(vector* v, size_t startidx, size_t endidx);
 
 
 //===========================================================================//
@@ -137,6 +139,12 @@ void vector_clear(vector* v) {
 }
 
 
+void vector_sort(vector* v) {
+    if (v == NULL || v->count == 0) return;
+    merge_sort(v, 0, v->count - 1);
+}
+
+
 //===========================================================================//
 //                          Helper Functions Definitions                     //
 //===========================================================================//
@@ -153,4 +161,38 @@ int vector_resize(vector* v, size_t new_capacity) {
         status      = SUCCESS;
     }
     return status;
+}
+
+void merge_sort(vector* v, size_t startidx, size_t endidx) {
+    if (startidx >= endidx) return;
+
+    size_t mididx = startidx + (endidx - startidx) / 2;
+
+    merge_sort(v, startidx, mididx);
+    merge_sort(v, mididx + 1, endidx);
+
+    void** temp[endidx - startidx + 1];
+    size_t l        = startidx;
+    size_t r        = mididx + 1;
+    size_t i        = 0;
+    size_t j        = startidx;
+
+    while (l <= mididx && r <= endidx) {
+        if (v->buf[l] <= v->buf[r]) {
+            temp[i++] = v->buf[l++];
+        } else {
+            temp[i++] = v->buf[r++];
+        }
+    }
+    while (l <= mididx) {
+        temp[i++] = v->buf[l++];
+    }
+    while (r <= endidx) {
+        temp[i++] = v->buf[r++];
+    }
+
+    i = 0;
+    while (j < endidx + 1) {
+        v->buf[j++] = temp[i++];
+    }
 }

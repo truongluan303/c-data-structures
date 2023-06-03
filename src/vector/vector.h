@@ -136,6 +136,13 @@ int vector_find(vector* v, void* data);
 void vector_clear(vector* v);
 
 /******************************************************************************
+ * @brief       Sort a vector.
+ *
+ * @param v             The vector to be sorted
+ *****************************************************************************/
+void vector_sort(vector* v);
+
+/******************************************************************************
  * @brief       Deallocates the memory allocated for the vector.
  *
  * @return      0 if successful, 1 otherwise
