@@ -19,6 +19,12 @@ typedef enum {
 BOOLEAN;
 
 /******************************************************************************
+ * @brief       Compare 2 values
+ *****************************************************************************/
+typedef short (*vector_value_comparator) (const void* leftval,
+                                          const void* rightval);
+
+/******************************************************************************
  * @brief       Represents the vector/list data structure.
  *****************************************************************************/
 typedef struct _vector vector;
@@ -134,6 +140,13 @@ int vector_find(vector* v, void* data);
  * @param v             The vector to be emptied.
  *****************************************************************************/
 void vector_clear(vector* v);
+
+/******************************************************************************
+ * @brief       Sort a vector.
+ *
+ * @param v             The vector to be sorted
+ *****************************************************************************/
+void vector_sort(vector* v, vector_value_comparator cmp);
 
 /******************************************************************************
  * @brief       Deallocates the memory allocated for the vector.
