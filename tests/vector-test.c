@@ -5,6 +5,26 @@
 #include "tester/tester.h"
 
 
+typedef struct _custom_data {
+    int intval;
+    int index;
+} custom_data;
+
+
+short custom_data_comparator(const void* leftval, const void* rightval) {
+    custom_data* leftdata = (custom_data*)leftval;
+    custom_data* rightdata = (custom_data*)rightval;
+
+    if (leftdata->intval < rightdata->intval) {
+        return -1;
+    } else if (leftdata->intval == rightdata->intval) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+
 void test_vector_sort() {
     vector* v;
     TRY { v = vector_construct(); } ENDTRY;
@@ -13,7 +33,7 @@ void test_vector_sort() {
     for (size_t _ = 0; _ < 100; _++) {
         vector_pushback(v, (void*)rand());
     }
-    vector_sort(v);
+    vector_sort(v, NULL);
     for (size_t i = 1; i < 100; i++) {
         TEST_ASSERT(vector_get(v, i - 1) <= vector_get(v, i));
     }
@@ -24,9 +44,23 @@ void test_vector_sort() {
     for (size_t _ = 0; _ < 10000; _++) {
         vector_pushback(v, (void*)rand());
     }
-    vector_sort(v);
+    vector_sort(v, NULL);
     for (size_t i = 1; i < 10000; i++) {
         TEST_ASSERT(vector_get(v, i - 1) <= vector_get(v, i));
+    }
+
+    vector_destroy(&v);
+    TRY { v = vector_construct(); } ENDTRY;
+
+    for (size_t i = 0; i < 10000; i++) {
+        custom_data data = {rand(), i};
+        vector_pushback(v, (void*)&data);
+    }
+    vector_sort(v, NULL);
+    for (size_t i = 1; i < 10000; i++) {
+        short cmp_result = custom_data_comparator(vector_get(v, i - 1),
+                                                  vector_get(v, i));
+        TEST_ASSERT(cmp_result <= 0);
     }
 
     vector_destroy(&v);

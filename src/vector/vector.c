@@ -7,7 +7,12 @@
 
 static int vector_resize(vector* v, size_t new_capacity);
 
-static void merge_sort(vector* v, size_t startidx, size_t endidx);
+static void merge_sort(vector* v,
+                       size_t startidx,
+                       size_t endidx,
+                       vector_value_comparator cmp);
+
+static short default_comparator(const void* leftval, const void* rightval);
 
 
 //===========================================================================//
@@ -139,9 +144,10 @@ void vector_clear(vector* v) {
 }
 
 
-void vector_sort(vector* v) {
+void vector_sort(vector* v, vector_value_comparator cmp) {
     if (v == NULL || v->count == 0) return;
-    merge_sort(v, 0, v->count - 1);
+
+    merge_sort(v, 0, v->count - 1, cmp != NULL ? cmp : &default_comparator);
 }
 
 
@@ -163,13 +169,16 @@ int vector_resize(vector* v, size_t new_capacity) {
     return status;
 }
 
-void merge_sort(vector* v, size_t startidx, size_t endidx) {
+void merge_sort(vector* v,
+                size_t startidx,
+                size_t endidx,
+                vector_value_comparator cmp) {
     if (startidx >= endidx) return;
 
     size_t mididx = startidx + (endidx - startidx) / 2;
 
-    merge_sort(v, startidx, mididx);
-    merge_sort(v, mididx + 1, endidx);
+    merge_sort(v, startidx, mididx, cmp);
+    merge_sort(v, mididx + 1, endidx, cmp);
 
     void** temp[endidx - startidx + 1];
     size_t l        = startidx;
@@ -178,7 +187,7 @@ void merge_sort(vector* v, size_t startidx, size_t endidx) {
     size_t j        = startidx;
 
     while (l <= mididx && r <= endidx) {
-        if (v->buf[l] <= v->buf[r]) {
+        if (cmp(v->buf[l], v->buf[r]) <= 0) {
             temp[i++] = v->buf[l++];
         } else {
             temp[i++] = v->buf[r++];
@@ -194,5 +203,15 @@ void merge_sort(vector* v, size_t startidx, size_t endidx) {
     i = 0;
     while (j < endidx + 1) {
         v->buf[j++] = temp[i++];
+    }
+}
+
+static short default_comparator(const void* leftval, const void* rightval) {
+    if (leftval < rightval) {
+        return -1;
+    } else if (leftval == rightval) {
+        return 0;
+    } else {
+        return 1;
     }
 }
