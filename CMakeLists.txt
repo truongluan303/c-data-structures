@@ -7,32 +7,26 @@ project(data_structures VERSION 1.0.0 DESCRIPTION "Data structures in C")
 # Declare the library target.
 add_library(${PROJECT_NAME} SHARED
     src/data_structures.h
-    src/deque/deque.h
-    src/deque/deque.c
-    src/trie/trie.h
-    src/trie/trie.c
-    src/linkedlist/singly_linked_list.h
-    src/linkedlist/singly_linked_list.c
-    src/vector/vector.h
-    src/vector/vector.c
+    src/deque.h
+    src/deque.c
+    src/trie.h
+    src/trie.c
+    src/singly_linked_list.h
+    src/singly_linked_list.c
+    src/vector.h
+    src/vector.c
 )
 
 # Configure the directories to search for header files.
-target_include_directories(${PROJECT_NAME} PRIVATE source)
-
-# Set the version property.
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
-
-# Set the shared object version property to the project's major version.
-set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
+target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 # Set the public header property to the one with the actual API.
 set(ALL_PUBLIC_HEADERS
     "src/data_structures.h"
-    "src/deque/deque.h"
-    "src/trie/trie.h"
-    "src/linkedlist/singly_linked_list.h"
-    "src/vector/vector.h"
+    "src/deque.h"
+    "src/trie.h"
+    "src/singly_linked_list.h"
+    "src/vector.h"
     )
 set_target_properties(${PROJECT_NAME} PROPERTIES
     PUBLIC_HEADER "${ALL_PUBLIC_HEADERS}"
