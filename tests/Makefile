@@ -7,7 +7,7 @@ CC 					= gcc
 CFLAGS 				= -g -w
 
 RM 					= rm
-RMFLAGS 			= -f
+RMFLAGS 			= -rf
 
 LIBS 				= -ldata_structures
 
@@ -57,8 +57,8 @@ test-vector:
 	./$(VECTOR)
 
 # clean target.
-# - removes the .o object files and the project's executable
+# - removes the .o object files, .dSYM directories, and the project's executable
 # - marked phony, because it's just a recipe and not a file
 .PHONY: clean
 clean:
-	$(RM) $(RMFLAGS) *.o $(PROJECT)
+	$(RM) $(RMFLAGS) *.o *.dSYM $(PROJECT)
